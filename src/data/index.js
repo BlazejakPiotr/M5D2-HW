@@ -2,6 +2,7 @@ import express from "express";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import uniqid from "uniqid";
 
 const postsRouter = express.Router();
 
@@ -12,16 +13,22 @@ const postsJSON = join(currentDirPath, "posts.json");
 console.log(postsJSON);
 
 postsRouter.post("/", (req, res) => {
-  res.send("hello there POST");
+  const newPost = { ...req.body, _id: uniqid() };
+  const posts = JSON.parse(fs.readFileSync(postsJSON));
+  posts.push(newPost);
+  fs.writeFileSync(postsJSON, JSON.stringify(posts));
+  res.send({ id: newPost._id });
 });
 
 postsRouter.get("/", (req, res) => {
   const posts = fs.readFileSync(postsJSON);
-  res.send("hello there");
+  res.send(JSON.parse(posts));
 });
 
 postsRouter.get("/:id", (req, res) => {
-  res.send("hello there");
+  const posts = JSON.parse(fs.readFileSync(postsJSON));
+  const post = posts.find((p) => p._id === parseInt(req.params.id));
+  res.send(post);
 });
 
 postsRouter.put("/:id", (req, res) => {
