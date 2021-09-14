@@ -27,7 +27,7 @@ postsRouter.get("/", (req, res) => {
 
 postsRouter.get("/:id", (req, res) => {
   const posts = JSON.parse(fs.readFileSync(postsJSON));
-  const post = posts.find((p) => p._id === parseInt(req.params.id));
+  const post = posts.find((p) => p._id === req.params.id);
   res.send(post);
 });
 
@@ -36,7 +36,10 @@ postsRouter.put("/:id", (req, res) => {
 });
 
 postsRouter.delete("/:id", (req, res) => {
-  res.send("hello there");
+  const posts = JSON.parse(fs.readFileSync(postsJSON));
+  const filteredPosts = posts.filter((p) => p._id !== req.params.id);
+  fs.writeFileSync(postsJSON, JSON.stringify(filteredPosts));
+  res.send();
 });
 
 export default postsRouter;
