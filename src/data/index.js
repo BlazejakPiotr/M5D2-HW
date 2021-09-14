@@ -32,7 +32,12 @@ postsRouter.get("/:id", (req, res) => {
 });
 
 postsRouter.put("/:id", (req, res) => {
-  res.send("hello there");
+  const posts = JSON.parse(fs.readFileSync(postsJSON));
+  const filteredPosts = posts.filter((p) => p._id !== req.params.id);
+  const updatedPost = { ...req.body, _id: req.params.id };
+  filteredPosts.push(updatedPost);
+  fs.writeFileSync(postsJSON, JSON.stringify(filteredPosts));
+  res.send(updatedPost);
 });
 
 postsRouter.delete("/:id", (req, res) => {
